@@ -1,0 +1,398 @@
+{% extends 'base.html' %}
+{% block title %}Analyser - PromptGuard{% endblock %}
+{% block topbar_title %}Prompt Analyser{% endblock %}
+{% block nav_analyser %}active{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Prompt Analyser</h1>
+      <p class="page-sub">Scan a prompt before it reaches any model. Results are written to the audit trail.</p>
+    </div>
+    <div class="status-row">
+      <span class="chip">Gemini AI Analysis</span>
+      <span class="chip">Generative Detection</span>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <section class="panel">
+      <div class="panel-head">
+        <h2 class="section-title">Prompt Input</h2>
+        <span class="chip" id="prompt-count">0 chars</span>
+      </div>
+      <label for="prompt-input">Prompt to analyse</label>
+      <div class="composer">
+        <button class="composer-plus" type="button" onclick="toggleAttachMenu()" aria-label="Add content">+</button>
+        <textarea id="prompt-input" rows="6" placeholder="Paste a prompt for firewall inspection..." oninput="updateCounter('prompt-input','prompt-count')"></textarea>
+        <div class="attach-menu result-hidden" id="attach-menu">
+          <button type="button" onclick="chooseFileForAnalysis()">Add document or file</button>
+          <button type="button" onclick="chooseImageForAnalysis()">Add photo or image</button>
+        </div>
+        <input id="file-input" class="result-hidden" type="file" accept=".pdf,.docx,.txt,.md,.csv,.json,.xml,.html,.htm,.log,.py,.js,.ts,.tsx,.jsx,.css,.yaml,.yml" onchange="handleFileSelected()"/>
+        <input id="image-input" class="result-hidden" type="file" accept="image/png,image/jpeg,image/gif,image/webp,.png,.jpg,.jpeg,.gif,.webp" onchange="handleImageSelected()"/>
+      </div>
+      <div class="field-meta">
+        <span>Ctrl + Enter to analyse</span>
+        <span>Max request size enforced by API</span>
+      </div>
+      <div id="file-meta" class="status-row file-meta"></div>
+      <div id="image-preview-wrap" class="result-hidden image-preview-wrap">
+        <img id="image-preview" class="image-preview" alt="Preview"/>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="analyse-btn" onclick="runAnalysis()">Analyse Prompt</button>
+        <button class="btn btn-primary result-hidden" id="file-analyse-btn" onclick="runFileAnalysis()">Analyse File</button>
+        <button class="btn btn-primary result-hidden" id="image-analyse-btn" onclick="runImageAnalysis()">Analyse Image</button>
+        <button class="btn btn-secondary" onclick="clearAnalysis()">Clear</button>
+        <div class="loader" id="loader">
+          <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
+          <span>AI Analysing</span>
+        </div>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <h2 class="section-title">Decision Policy</h2>
+      <div class="drawer-row">
+        <div class="drawer-key safe">ALLOW</div>
+        <div class="drawer-value muted">Low-risk prompts can continue.</div>
+      </div>
+      <div class="drawer-row">
+        <div class="drawer-key warn">WARN</div>
+        <div class="drawer-value muted">Medium-risk prompts need human review.</div>
+      </div>
+      <div class="drawer-row">
+        <div class="drawer-key danger">BLOCK</div>
+        <div class="drawer-value muted">High-risk prompts are stopped before model access.</div>
+      </div>
+      <div class="drawer-row" style="margin-top:1rem;">
+        <div class="drawer-key">Engine</div>
+        <div class="drawer-value muted">Gemini classifies all submitted text as untrusted data.</div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="panel result-panel result-hidden" id="result-card">
+    <div class="result-head">
+      <div class="decision-group">
+        <span id="decision-badge" class="badge"></span>
+        <span id="threat-label" class="chip"></span>
+        <span id="time-label" class="chip"></span>
+      </div>
+    </div>
+
+    <div class="metric-grid">
+      <div class="metric">
+        <div class="metric-label">Risk Score</div>
+        <div class="metric-value" id="score-label">0 / 100</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Threat Level</div>
+        <div class="metric-value" id="threat-metric">LOW</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Attack Types</div>
+        <div class="metric-value" id="attack-count">0</div>
+      </div>
+    </div>
+
+    <div class="risk-bar-wrap">
+      <div class="risk-bar-label"><span>Safe</span><span>Warn</span><span>Block</span></div>
+      <div class="risk-bar-track"><div class="risk-bar-fill" id="risk-fill"></div></div>
+    </div>
+
+    <div style="margin-top:1rem;">
+      <h2 class="section-title">Attack Types Detected</h2>
+      <div class="status-row" id="attack-types"></div>
+    </div>
+
+    <div style="margin-top:1rem;">
+      <h2 class="section-title">AI Reasoning</h2>
+      <ul class="reasons" id="reasons-list"></ul>
+    </div>
+  </section>
+</div>
+<style>
+  .composer {
+    position: relative;
+  }
+  .composer textarea {
+    padding-left: 3.25rem;
+  }
+  .composer-plus {
+    position: absolute;
+    top: 0.85rem;
+    left: 0.8rem;
+    z-index: 2;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--panel-3);
+    color: var(--text-strong);
+    cursor: pointer;
+    font-size: 1.45rem;
+    line-height: 1;
+  }
+  .attach-menu {
+    position: absolute;
+    top: 3.2rem;
+    left: 0.8rem;
+    z-index: 10;
+    width: min(280px, calc(100% - 1.6rem));
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #111820;
+    padding: 0.45rem;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.45);
+  }
+  .attach-menu button {
+    width: 100%;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    padding: 0.75rem;
+    text-align: left;
+    font: inherit;
+  }
+  .attach-menu button:hover:not(:disabled) {
+    background: rgba(22,215,232,0.1);
+  }
+  .attach-menu button:disabled {
+    color: var(--muted-2);
+    cursor: not-allowed;
+  }
+  .attach-menu span {
+    float: right;
+    color: var(--warn);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+  .file-meta {
+    margin-top: 0.8rem;
+  }
+  .image-preview-wrap {
+    margin-top: 0.8rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.5rem;
+    background: var(--panel-2);
+    display: inline-block;
+  }
+  .image-preview {
+    max-width: 220px;
+    max-height: 160px;
+    border-radius: 6px;
+    display: block;
+  }
+</style>
+<script>
+  function getBadgeClass(d){return d==='BLOCK'?'badge-block':d==='WARN'?'badge-warn':'badge-allow';}
+  function getPanelClass(d){return d==='BLOCK'?'block':d==='WARN'?'warn':'allow';}
+  function selectedFile(){
+    const input=document.getElementById('file-input');
+    return input.files && input.files.length ? input.files[0] : null;
+  }
+  function toggleAttachMenu(){
+    document.getElementById('attach-menu').classList.toggle('result-hidden');
+  }
+  function closeAttachMenu(){
+    document.getElementById('attach-menu').classList.add('result-hidden');
+  }
+  function chooseFileForAnalysis(){
+    closeAttachMenu();
+    document.getElementById('file-input').click();
+  }
+  function handleFileSelected(){
+    const file=selectedFile();
+    const meta=document.getElementById('file-meta');
+    meta.replaceChildren();
+    if(!file)return;
+    meta.appendChild(makeBadge(file.name,'badge badge-allow'));
+    meta.appendChild(makeBadge(`${Math.ceil(file.size/1024)} KB selected`,'badge'));
+    document.getElementById('file-analyse-btn').classList.remove('result-hidden');
+  }
+  function clearAnalysis(){
+    document.getElementById('prompt-input').value='';
+    document.getElementById('file-input').value='';
+    document.getElementById('image-input').value='';
+    document.getElementById('file-meta').replaceChildren();
+    document.getElementById('file-analyse-btn').classList.add('result-hidden');
+    document.getElementById('image-analyse-btn').classList.add('result-hidden');
+    document.getElementById('image-preview-wrap').classList.add('result-hidden');
+    updateCounter('prompt-input','prompt-count');
+    document.getElementById('result-card').classList.add('result-hidden');
+    closeAttachMenu();
+  }
+  function chooseImageForAnalysis(){
+    closeAttachMenu();
+    document.getElementById('image-input').click();
+  }
+  function handleImageSelected(){
+    const input=document.getElementById('image-input');
+    const file=input.files && input.files.length ? input.files[0] : null;
+    const meta=document.getElementById('file-meta');
+    const previewWrap=document.getElementById('image-preview-wrap');
+    const previewImg=document.getElementById('image-preview');
+    meta.replaceChildren();
+    if(!file){
+      previewWrap.classList.add('result-hidden');
+      return;
+    }
+    meta.appendChild(makeBadge(file.name,'badge badge-allow'));
+    meta.appendChild(makeBadge(`${Math.ceil(file.size/1024)} KB selected`,'badge'));
+    meta.appendChild(makeBadge('Image','badge'));
+    document.getElementById('image-analyse-btn').classList.remove('result-hidden');
+    document.getElementById('file-analyse-btn').classList.add('result-hidden');
+    // Show preview
+    const reader=new FileReader();
+    reader.onload=function(e){
+      previewImg.src=e.target.result;
+      previewWrap.classList.remove('result-hidden');
+    };
+    reader.readAsDataURL(file);
+    // Clear any selected document file
+    document.getElementById('file-input').value='';
+  }
+  function renderAnalysisResult(data){
+    const result=document.getElementById('result-card');
+    result.className=`panel result-panel ${getPanelClass(data.decision)}`;
+    const badge=document.getElementById('decision-badge');
+    badge.textContent=data.decision;
+    badge.className=`badge ${getBadgeClass(data.decision)}`;
+    document.getElementById('threat-label').textContent=`Threat ${data.threat_level}`;
+    document.getElementById('time-label').textContent=`${data.processing_time_ms}ms`;
+    document.getElementById('score-label').textContent=`${data.risk_score} / 100`;
+    document.getElementById('threat-metric').textContent=data.threat_level;
+    document.getElementById('attack-count').textContent=data.attack_types.length;
+    document.getElementById('risk-fill').style.width=`${data.risk_score}%`;
+
+    const attackTypes=document.getElementById('attack-types');
+    attackTypes.replaceChildren();
+    if(data.attack_types.length){
+      data.attack_types.forEach(t=>attackTypes.appendChild(makeBadge(t.replace(/_/g,' '),'badge badge-block')));
+    }else{
+      attackTypes.appendChild(makeBadge('None detected','badge badge-allow'));
+    }
+    if(data.fallback_used){
+      attackTypes.appendChild(makeBadge('Fallback mode','badge badge-warn'));
+    }
+    if(data.file){
+      attackTypes.appendChild(makeBadge(`${data.file.analyzed_chars}/${data.file.extracted_chars} chars analysed`,'badge'));
+      if(data.file.truncated){
+        attackTypes.appendChild(makeBadge('Truncated for limit','badge badge-warn'));
+      }
+    }
+    replaceChildrenTextList(document.getElementById('reasons-list'),data.reasons,'No threats detected - content is safe');
+  }
+  async function runAnalysis(){
+    const prompt=document.getElementById('prompt-input').value.trim();
+    if(!prompt)return;
+    const btn=document.getElementById('analyse-btn');
+    const loader=document.getElementById('loader');
+    const result=document.getElementById('result-card');
+    btn.disabled=true;
+    loader.classList.add('active');
+    result.classList.add('result-hidden');
+    try{
+      const res=await fetch('/api/analyze',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')||''},
+        body:JSON.stringify({prompt})
+      });
+      const data=await res.json();
+      if(!res.ok)throw new Error(data.error||'Analysis failed');
+      renderAnalysisResult(data);
+    }catch(err){
+      showToast(err.message,'error');
+    }finally{
+      btn.disabled=false;
+      loader.classList.remove('active');
+    }
+  }
+  async function runFileAnalysis(){
+    const file=selectedFile();
+    if(!file)return;
+    const btn=document.getElementById('file-analyse-btn');
+    const promptBtn=document.getElementById('analyse-btn');
+    const loader=document.getElementById('loader');
+    const result=document.getElementById('result-card');
+    const meta=document.getElementById('file-meta');
+    const formData=new FormData();
+    formData.append('file',file);
+    btn.disabled=true;
+    promptBtn.disabled=true;
+    loader.classList.add('active');
+    result.classList.add('result-hidden');
+    try{
+      const res=await fetch('/api/analyze-file',{
+        method:'POST',
+        headers:{'X-CSRFToken':getCookie('csrftoken')||''},
+        body:formData
+      });
+      const data=await res.json();
+      if(!res.ok)throw new Error(data.error||'File analysis failed');
+      renderAnalysisResult(data);
+      meta.replaceChildren();
+      meta.appendChild(makeBadge(data.file.name,'badge badge-allow'));
+      meta.appendChild(makeBadge(`${data.file.analyzed_chars}/${data.file.extracted_chars} chars analysed`,'badge'));
+      if(data.file.truncated){
+        meta.appendChild(makeBadge('Truncated for analysis limit','badge badge-warn'));
+      }
+    }catch(err){
+      showToast(err.message,'error');
+    }finally{
+      btn.disabled=false;
+      promptBtn.disabled=false;
+      loader.classList.remove('active');
+    }
+  }
+  document.addEventListener('click',e=>{
+    const menu=document.getElementById('attach-menu');
+    const plus=document.querySelector('.composer-plus');
+    if(!menu.contains(e.target) && e.target!==plus){
+      closeAttachMenu();
+    }
+  });
+  document.getElementById('prompt-input').addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='Enter')runAnalysis();});
+  async function runImageAnalysis(){
+    const input=document.getElementById('image-input');
+    const file=input.files && input.files.length ? input.files[0] : null;
+    if(!file)return;
+    const btn=document.getElementById('image-analyse-btn');
+    const promptBtn=document.getElementById('analyse-btn');
+    const loader=document.getElementById('loader');
+    const result=document.getElementById('result-card');
+    const meta=document.getElementById('file-meta');
+    const formData=new FormData();
+    formData.append('file',file);
+    btn.disabled=true;
+    promptBtn.disabled=true;
+    loader.classList.add('active');
+    result.classList.add('result-hidden');
+    try{
+      const res=await fetch('/api/analyze-image',{
+        method:'POST',
+        headers:{'X-CSRFToken':getCookie('csrftoken')||''},
+        body:formData
+      });
+      const data=await res.json();
+      if(!res.ok)throw new Error(data.error||'Image analysis failed');
+      renderAnalysisResult(data);
+      meta.replaceChildren();
+      meta.appendChild(makeBadge(data.file.name,'badge badge-allow'));
+      meta.appendChild(makeBadge(`${Math.ceil(data.file.size/1024)} KB analysed`,'badge'));
+      meta.appendChild(makeBadge('Image','badge'));
+    }catch(err){
+      showToast(err.message,'error');
+    }finally{
+      btn.disabled=false;
+      promptBtn.disabled=false;
+      loader.classList.remove('active');
+    }
+  }
+</script>
+{% endblock %}
