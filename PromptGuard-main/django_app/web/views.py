@@ -26,6 +26,10 @@ def firewall(request):
     return render(request, 'firewall.html')
 
 
+def about(request):
+    return render(request, 'about.html')
+
+
 def dashboard(request):
     logs = PromptLog.objects.all()
     total = logs.count()

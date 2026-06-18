@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}About — PromptGuard{% endblock %}
+{% block nav_about %}active{% endblock %}
+{% block topbar_title %}About PromptGuard{% endblock %}
+
+{% block content %}
+<div class="page">
+
+  <!-- Page Header -->
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">About PromptGuard</h1>
+      <p class="page-sub">AI-powered prompt firewall protecting your LLM applications from adversarial attacks.</p>
+    </div>
+  </div>
+
+  <!-- Project Overview -->
+  <div class="panel" style="border-left: 4px solid var(--accent);">
+    <div class="panel-head">
+      <h2 class="section-title">Project Overview</h2>
+      <span class="chip"><span class="status-dot"></span>Open Source</span>
+    </div>
+    <p style="color: var(--text); line-height: 1.7; margin: 0;">
+      <strong style="color: var(--text-strong);">PromptGuard</strong> is a real-time prompt analysis and firewall system
+      designed to detect and prevent prompt injection attacks, jailbreak attempts, and other adversarial inputs
+      targeting Large Language Models. It provides a multi-layered defence including pattern-based analysis, risk
+      scoring, configurable policies, and a full audit trail for compliance and forensics.
+    </p>
+  </div>
+
+  <!-- Key Features -->
+  <div class="panel">
+    <div class="panel-head">
+      <h2 class="section-title">Key Features</h2>
+    </div>
+    <div class="metric-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+      <div class="metric" style="border-top: 3px solid var(--accent);">
+        <div class="metric-label">🛡️ Live Firewall</div>
+        <p style="color: var(--text); font-size: 0.88rem; margin: 0.5rem 0 0; line-height: 1.5;">
+          Intercept, analyse, and block malicious prompts before they reach the model.
+        </p>
+      </div>
+      <div class="metric" style="border-top: 3px solid var(--warn);">
+        <div class="metric-label">📊 Risk Scoring</div>
+        <p style="color: var(--text); font-size: 0.88rem; margin: 0.5rem 0 0; line-height: 1.5;">
+          Multi-factor risk assessment with configurable thresholds for ALLOW, WARN, and BLOCK decisions.
+        </p>
+      </div>
+      <div class="metric" style="border-top: 3px solid var(--safe);">
+        <div class="metric-label">🔍 Prompt Analyser</div>
+        <p style="color: var(--text); font-size: 0.88rem; margin: 0.5rem 0 0; line-height: 1.5;">
+          Deep inspection of prompt patterns including injection, jailbreaks, and data exfiltration attempts.
+        </p>
+      </div>
+      <div class="metric" style="border-top: 3px solid var(--danger);">
+        <div class="metric-label">📋 Audit Logs</div>
+        <p style="color: var(--text); font-size: 0.88rem; margin: 0.5rem 0 0; line-height: 1.5;">
+          Complete audit trail with CSV/JSON export for compliance and incident response.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team Members -->
+  <div class="panel">
+    <div class="panel-head">
+      <h2 class="section-title">Team Members</h2>
+    </div>
+    <div class="metric-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+      <div class="metric" style="text-align: center; padding: 1.4rem 1rem;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--accent-soft); border: 2px solid var(--accent); display: grid; place-items: center; margin: 0 auto 0.8rem; font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; color: var(--accent);">SF</div>
+        <div style="color: var(--text-strong); font-weight: 600; font-size: 0.95rem;">Sfiza</div>
+        <div style="color: var(--muted); font-family: var(--font-mono); font-size: 0.76rem; margin-top: 0.25rem;">Project Lead &amp; Core Developer</div>
+      </div>
+      <div class="metric" style="text-align: center; padding: 1.4rem 1rem;">
+        <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--safe-soft); border: 2px solid var(--safe); display: grid; place-items: center; margin: 0 auto 0.8rem; font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; color: var(--safe);">PM</div>
+        <div style="color: var(--text-strong); font-weight: 600; font-size: 0.95rem;">Priyanka Mandloi</div>
+        <div style="color: var(--muted); font-family: var(--font-mono); font-size: 0.76rem; margin-top: 0.25rem;">Developer &amp; Contributor</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Technology Stack -->
+  <div class="panel">
+    <div class="panel-head">
+      <h2 class="section-title">Technology Stack</h2>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.6rem;">
+      <span class="chip" style="border-color: rgba(22,215,232,0.35); color: var(--accent);">Python</span>
+      <span class="chip" style="border-color: rgba(32,214,123,0.35); color: var(--safe);">Django</span>
+      <span class="chip" style="border-color: rgba(255,176,32,0.35); color: var(--warn);">REST API</span>
+      <span class="chip" style="border-color: rgba(255,77,109,0.35); color: var(--danger);">Prompt Security</span>
+      <span class="chip" style="border-color: rgba(22,215,232,0.35); color: var(--accent);">Chart.js</span>
+      <span class="chip" style="border-color: rgba(32,214,123,0.35); color: var(--safe);">SQLite / PostgreSQL</span>
+    </div>
+  </div>
+
+  <!-- Repository Info -->
+  <div class="panel" style="border-left: 4px solid var(--safe);">
+    <div class="panel-head">
+      <h2 class="section-title">Repository</h2>
+    </div>
+    <p style="color: var(--text); line-height: 1.7; margin: 0;">
+      Source code is available on GitHub at
+      <a href="https://github.com/sfiza12/PromptGuard" target="_blank" rel="noopener noreferrer"
+         style="color: var(--accent); text-decoration: underline; text-underline-offset: 3px;">
+        github.com/sfiza12/PromptGuard
+      </a>.
+      Contributions, issues, and feature requests are welcome.
+    </p>
+  </div>
+
+</div>
+{% endblock %}
