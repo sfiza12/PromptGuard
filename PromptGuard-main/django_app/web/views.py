@@ -145,3 +145,9 @@ def export_logs(request):
     response = HttpResponse(output.getvalue(), content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="promptguard_audit_logs.csv"'
     return response
+
+
+@ensure_csrf_cookie
+def alumni(request):
+    return render(request, 'alumni.html')
+
