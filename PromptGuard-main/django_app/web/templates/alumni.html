@@ -1,0 +1,450 @@
+{% extends 'base.html' %}
+{% block title %}Alumni & Mentors - PromptGuard{% endblock %}
+{% block topbar_title %}Alumni & Mentors Directory{% endblock %}
+{% block nav_alumni %}active{% endblock %}
+{% block content %}
+<div class="page">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Alumni & Mentors</h1>
+      <p class="page-sub">Connect with AI Security professionals, research mentors, and industry experts.</p>
+    </div>
+    <div class="status-row">
+      <span class="chip"><span id="visible-count">9</span> profiles</span>
+      <span class="chip">PromptGuard Network</span>
+    </div>
+  </div>
+
+  <!-- ─── Search & Filters Row ─── -->
+  <section class="panel filter-panel">
+    <div class="filter-row">
+      <div>
+        <label for="alumni-search">Search by Name</label>
+        <input id="alumni-search" type="text" placeholder="Type a name to search..." oninput="filterAlumni()"/>
+      </div>
+      <div>
+        <label for="role-filter">Network Role</label>
+        <select id="role-filter" onchange="filterAlumni()">
+          <option value="">All Roles</option>
+          <option value="mentor">Mentors Only</option>
+          <option value="alumni">Alumni Only</option>
+        </select>
+      </div>
+      <div>
+        <label for="expertise-filter">Expertise Area</label>
+        <select id="expertise-filter" onchange="filterAlumni()">
+          <option value="">All Expertise</option>
+          <option value="Prompt Injection">Prompt Injection</option>
+          <option value="Jailbreak Defense">Jailbreak Defense</option>
+          <option value="Indirect Injection">Indirect Injection</option>
+          <option value="LLM Output Verification">Output Verification</option>
+          <option value="Multimodal Firewalls">Multimodal Safety</option>
+          <option value="Threat Modeling">Threat Modeling</option>
+          <option value="Audit Trail Logging">Logging & DevSecOps</option>
+        </select>
+      </div>
+      <div>
+        <label for="year-filter">Graduation Year</label>
+        <select id="year-filter" onchange="filterAlumni()">
+          <option value="">All Years</option>
+          <option value="2017">Class of 2017</option>
+          <option value="2018">Class of 2018</option>
+          <option value="2019">Class of 2019</option>
+          <option value="2020">Class of 2020</option>
+          <option value="2021">Class of 2021</option>
+          <option value="2022">Class of 2022</option>
+          <option value="2023">Class of 2023</option>
+          <option value="2024">Class of 2024</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Alumni & Mentors Cards Grid ─── -->
+  <div class="alumni-grid" id="alumni-grid">
+    <!-- Card 1 -->
+    <div class="alumni-card" data-name="Dr. Evelyn Chen" data-roles="mentor" data-expertise="Prompt Injection, Jailbreak Defense" data-year="2018">
+      <div class="card-top">
+        <div class="avatar-wrapper">
+          <div class="avatar" style="background: linear-gradient(135deg, #16d7e8, #001016);">EC</div>
+        </div>
+        <div class="role-badges">
+          <span class="badge badge-allow">Mentor</span>
+        </div>
+      </div>
+      <div class="card-info">
+        <h3 class="alumni-name">Dr. Evelyn Chen</h3>
+        <div class="alumni-title">Director of AI Safety Research</div>
+        <div class="alumni-company">Anthropic</div>
+        <div class="alumni-year">Class of 2018</div>
+        <p class="alumni-bio">Ph.D. in Robust Machine Learning. Ex-Google Brain. Specializes in designing robust system prompts and alignment guidelines for Claude.</p>
+        <div class="expertise-tags">
+          <span class="tag">Prompt Injection</span>
+          <span class="tag">Jailbreak Defense</span>
+        </div>
+      </div>
+      <div class="card-action">
+        <button class="btn btn-secondary btn-full" onclick="contactNetwork('Dr. Evelyn Chen', 'evelyn.chen@safety-engineering.ai')">Contact Evelyn</button>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="alumni-card" data-name="Marcus Vance" data-roles="alumni" data-expertise="LLM Output Verification" data-year="2021">
+      <div class="card-top">
+        <div class="avatar-wrapper">
+          <div class="avatar" style="background: linear-gradient(135deg, #ffb020, #1a1000);">MV</div>
+        </div>
+        <div class="role-badges">
+          <span class="badge badge-block">Alumni</span>
+        </div>
+      </div>
+      <div class="card-info">
+        <h3 class="alumni-name">Marcus Vance</h3>
+        <div class="alumni-title">Senior Security Consultant</div>
+        <div class="alumni-company">Trail of Bits</div>
+        <div class="alumni-year">Class of 2021</div>
+        <p class="alumni-bio">Cybersecurity researcher focused on vulnerabilities in RAG applications. Enjoys reverse-engineering security wrappers around downstream models.</p>
+        <div class="expertise-tags">
+          <span class="tag">LLM Output Verification</span>
+        </div>
+      </div>
+      <div class="card-action">
+        <button class="btn btn-secondary btn-full" onclick="contactNetwork('Marcus Vance', 'm.vance@trailofbits.com')">Contact Marcus</button>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="alumni-card" data-name="Priya Nair" data-roles="mentor,alumni" data-expertise="Multimodal Firewalls" data-year="2020">
+      <div class="card-top">
+        <div class="avatar-wrapper">
+          <div class="avatar" style="background: linear-gradient(135deg, #20d67b, #001f0f);">PN</div>
+        </div>
+        <div class="role-badges">
+          <span class="badge badge-allow">Mentor</span>
+          <span class="badge badge-block">Alumni</span>
+        </div>
+      </div>
+      <div class="card-info">
+        <h3 class="alumni-name">Priya Nair</h3>
+        <div class="alumni-title">Lead Machine Learning Engineer</div>
+        <div class="alumni-company">OpenAI</div>
+        <div class="alumni-year">Class of 2020</div>
+        <p class="alumni-bio">Expert in multimodal safety filters (GPT-4o vision security). Graduated top of her class and now mentors new AI security researchers.</p>
+        <div class="expertise-tags">
+          <span class="tag">Multimodal Firewalls</span>
+        </div>
+      </div>
+      <div class="card-action">
+        <button class="btn btn-secondary btn-full" onclick="contactNetwork('Priya Nair', 'p.nair@openai.com')">Contact Priya</button>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="alumni-card" data-name="Alex Mercer" data-roles="alumni" data-expertise="Jailbreak Defense" data-year="2023">
+      <div class="card-top">
+        <div class="avatar-wrapper">
+          <div class="avatar" style="background: linear-gradient(135deg, #ff4d6d, #200005);">AM</div>
+        </div>
+        <div class="role-badges">
+          <span class="badge badge-block">Alumni</span>
+        </div>
+      </div>
+      <div class="card-info">
+        <h3 class="alumni-name">Alex Mercer</h3>
+        <div class="alumni-title">Security Engineer</div>
+        <div class="alumni-company">Hugging Face</div>
+        <div class="alumni-year">Class of 2023</div>
+        <p class="alumni-bio">Maintains safety evaluation datasets and built some of the early open-source libraries for automated adversarial jailbreak testing.</p>
+        <div class="expertise-tags">
+          <span class="tag">Jailbreak Defense</span>
+        </div>
+      </div>
+      <div class="card-action">
+        <button class="btn btn-secondary btn-full" onclick="contactNetwork('Alex Mercer', 'mercer@huggingface.co')">Contact Alex</button>
+      </div>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="alumni-card" data-name="Yuki Tanaka" data-roles="mentor" data-expertise="Threat Modeling" data-year="2017">
+      <div class="card-top">
+        <div class="avatar-wrapper">
+          <div class="avatar" style="background: linear-gradient(135deg, #7e8da1, #0d131b);">YT</div>
+        </div>
+        <div class="role-badges">
+          <span class="badge badge-allow">Mentor</span>
+        </div>
+      </div>
+      <div class="card-info">
+        <h3 class="alumni-name">Yuki Tanaka</h3>
+        <div class="alumni-title">Principal Cyber Architect</div>
+        <div class="alumni-company">Sony AI</div>
+        <div class="alumni-year">Class of 2017</div>
+        <p class="alumni-bio">Helps translate standard cybersecurity threat modeling frameworks into prompt engineering workflows. Active OWASP LLM project contributor.</p>
+        <div class="expertise-tags">
+          <span class="tag">Threat Modeling</span>
+        </div>
+      </div>
+      <div class="card-action">
+        <button class="btn btn-secondary btn-full" onclick="contactNetwork('Yuki Tanaka', 'y.tanaka@sony.co.jp')">Contact Yuki</button>
+      </div>
+    </div>
+
+    <!-- Card 6 -->
+    <div class="alumni-card" data-name="Sarah Jenkins" data-roles="alumni" data-expertise="Prompt Injection" data-year="2022">
+      <div class="card-top">
+        <div class="avatar-wrapper">
+          <div class="avatar" style="background: linear-gradient(135deg, #16d7e8, #ffb020);">SJ</div>
+        </div>
+        <div class="role-badges">
+          <span class="badge badge-block">Alumni</span>
+        </div>
+      </div>
+      <div class="card-info">
+        <h3 class="alumni-name">Sarah Jenkins</h3>
+        <div class="alumni-title">Founder & CTO</div>
+        <div class="alumni-company">GuardRail AI</div>
+        <div class="alumni-year">Class of 2022</div>
+        <p class="alumni-bio">Built a real-time gateway that intercepts malicious LLM payloads. Passionate about fail-secure enterprise system architectures.</p>
+        <div class="expertise-tags">
+          <span class="tag">Prompt Injection</span>
+        </div>
+      </div>
+      <div class="card-action">
+        <button class="btn btn-secondary btn-full" onclick="contactNetwork('Sarah Jenkins', 'sarah@guardrail.ai')">Contact Sarah</button>
+      </div>
+    </div>
+
+    <!-- Card 7 -->
+    <div class="alumni-card" data-name="Liam O'Connor" data-roles="mentor" data-expertise="Indirect Injection" data-year="2019">
+      <div class="card-top">
+        <div class="avatar-wrapper">
+          <div class="avatar" style="background: linear-gradient(135deg, #20d67b, #16d7e8);">LO</div>
+        </div>
+        <div class="role-badges">
+          <span class="badge badge-allow">Mentor</span>
+        </div>
+      </div>
+      <div class="card-info">
+        <h3 class="alumni-name">Liam O'Connor</h3>
+        <div class="alumni-title">Senior AI Security Researcher</div>
+        <div class="alumni-company">DeepMind</div>
+        <div class="alumni-year">Class of 2019</div>
+        <p class="alumni-bio">Researching how models handle malicious instructions embedded in documents. Lead author of 'Robustness in Long-Context LLMs'.</p>
+        <div class="expertise-tags">
+          <span class="tag">Indirect Injection</span>
+        </div>
+      </div>
+      <div class="card-action">
+        <button class="btn btn-secondary btn-full" onclick="contactNetwork('Liam O\'Connor', 'liam.oc@google.com')">Contact Liam</button>
+      </div>
+    </div>
+
+    <!-- Card 8 -->
+    <div class="alumni-card" data-name="Sofia Alvarez" data-roles="alumni" data-expertise="Threat Modeling" data-year="2024">
+      <div class="card-top">
+        <div class="avatar-wrapper">
+          <div class="avatar" style="background: linear-gradient(135deg, #ffb020, #ff4d6d);">SA</div>
+        </div>
+        <div class="role-badges">
+          <span class="badge badge-block">Alumni</span>
+        </div>
+      </div>
+      <div class="card-info">
+        <h3 class="alumni-name">Sofia Alvarez</h3>
+        <div class="alumni-title">Software Engineer (Security)</div>
+        <div class="alumni-company">Vercel</div>
+        <div class="alumni-year">Class of 2024</div>
+        <p class="alumni-bio">Focuses on web application security, middleware pipelines, and preventing server-side request forgery (SSRF) via LLM tools.</p>
+        <div class="expertise-tags">
+          <span class="tag">Threat Modeling</span>
+        </div>
+      </div>
+      <div class="card-action">
+        <button class="btn btn-secondary btn-full" onclick="contactNetwork('Sofia Alvarez', 'sofia.alvarez@vercel.com')">Contact Sofia</button>
+      </div>
+    </div>
+
+    <!-- Card 9 -->
+    <div class="alumni-card" data-name="David Kim" data-roles="alumni" data-expertise="Audit Trail Logging" data-year="2023">
+      <div class="card-top">
+        <div class="avatar-wrapper">
+          <div class="avatar" style="background: linear-gradient(135deg, #16d7e8, #7e8da1);">DK</div>
+        </div>
+        <div class="role-badges">
+          <span class="badge badge-block">Alumni</span>
+        </div>
+      </div>
+      <div class="card-info">
+        <h3 class="alumni-name">David Kim</h3>
+        <div class="alumni-title">DevSecOps Engineer</div>
+        <div class="alumni-company">Datadog</div>
+        <div class="alumni-year">Class of 2023</div>
+        <p class="alumni-bio">Built PromptGuard's SQLite audit store logging integration. Expert in monitoring and alerting pipelines for AI model services.</p>
+        <div class="expertise-tags">
+          <span class="tag">Audit Trail Logging</span>
+        </div>
+      </div>
+      <div class="card-action">
+        <button class="btn btn-secondary btn-full" onclick="contactNetwork('David Kim', 'd.kim@datadog.com')">Contact David</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── No Results Message ─── -->
+  <div id="no-results" class="muted text-center" style="display:none; padding:4rem 2rem; text-align:center; font-family:var(--font-mono); border:1px dashed var(--line); border-radius:8px;">
+    No alumni or mentors match your filter criteria.
+  </div>
+</div>
+
+<style>
+  .filter-panel {
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .alumni-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.25rem;
+  }
+  .alumni-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .alumni-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(22, 215, 232, 0.45);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  }
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.85rem;
+  }
+  .avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.05rem;
+    font-family: var(--font-display);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .role-badges {
+    display: flex;
+    gap: 0.35rem;
+  }
+  .alumni-name {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+  }
+  .alumni-title {
+    color: var(--accent);
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin-top: 0.15rem;
+  }
+  .alumni-company {
+    color: var(--text);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  .alumni-year {
+    font-family: var(--font-mono);
+    color: var(--muted);
+    font-size: 0.76rem;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+  }
+  .alumni-bio {
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin: 0.5rem 0 1rem;
+  }
+  .expertise-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 1.2rem;
+  }
+  .tag {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.15rem 0.45rem;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+  }
+  .btn-full {
+    width: 100%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .text-center {
+    text-align: center;
+  }
+</style>
+
+<script>
+  function filterAlumni() {
+    const searchVal = document.getElementById('alumni-search').value.toLowerCase().trim();
+    const roleVal = document.getElementById('role-filter').value;
+    const expVal = document.getElementById('expertise-filter').value;
+    const yearVal = document.getElementById('year-filter').value;
+
+    let visibleCount = 0;
+    const cards = document.querySelectorAll('.alumni-card');
+
+    cards.forEach(card => {
+      const name = card.getAttribute('data-name').toLowerCase();
+      const roles = card.getAttribute('data-roles').split(',');
+      const expertise = card.getAttribute('data-expertise');
+      const year = card.getAttribute('data-year');
+
+      const matchSearch = !searchVal || name.includes(searchVal);
+      const matchRole = !roleVal || roles.includes(roleVal);
+      const matchExpertise = !expVal || expertise.includes(expVal);
+      const matchYear = !yearVal || year === yearVal;
+
+      const isVisible = matchSearch && matchRole && matchExpertise && matchYear;
+      card.style.display = isVisible ? '' : 'none';
+      if (isVisible) {
+        visibleCount++;
+      }
+    });
+
+    document.getElementById('visible-count').textContent = visibleCount;
+    const noResults = document.getElementById('no-results');
+    if (visibleCount === 0) {
+      noResults.style.display = '';
+    } else {
+      noResults.style.display = 'none';
+    }
+  }
+
+  function contactNetwork(name, email) {
+    if (typeof showToast === 'function') {
+      showToast(`Contacting ${name} via ${email}...`, 'success');
+    } else {
+      alert(`Contact ${name} at ${email}`);
+    }
+  }
+</script>
+{% endblock %}
